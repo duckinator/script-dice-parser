@@ -21,21 +21,13 @@ variable                    : scope=LOCAL_VAR_LEADER IDENTIFIER
 extPropName                 : (IDENTIFIER DOT)* IDENTIFIER
                             ;
 
-group                       : LPAREN val=expression RPAREN                          # parenGroup
-                            | LBRACE val=expression RBRACE                          # braceGroup
-                            ;
-
-dice                        : numDice? diceName=IDENTIFIER diceArguments?
+dice                        : numDice diceName=IDENTIFIER diceArguments?
                             ;
 
 
-numDice                     : integerLiteral
-                            | group
-                            ;
-
-
-diceSides                   : integerLiteral
-                            | group
+numDice                     : val=DECIMAL_LITERAL           # numDiceLiteral
+                            | LPAREN val=expression RPAREN  # parenGroup
+                            | LBRACE val=expression RBRACE  # braceGroup
                             ;
 
 doubleValue                 : NUMBER_LITERAL

@@ -152,26 +152,14 @@ public class BuildASTVisitor extends MTScript2ParserBaseVisitor<ASTNode>
   public ASTNode visitDice(MTScript2Parser.DiceContext ctx) {
     return visitChildren(ctx);
   }
-  /**
-   * {@inheritDoc}
-   *
-   * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-   * ctx}.
-   */
+
+  /** Entry point for numDiceLiteral */
   @Override
-  public ASTNode visitNumDice(MTScript2Parser.NumDiceContext ctx) {
-    return visitChildren(ctx);
+  public ASTNode visitNumDiceLiteral(MTScript2Parser.NumDiceLiteralContext ctx) {
+    Integer x = Integer.parseInt(ctx.getText());
+    return new LiteralNode.IntegerLiteralNode(x);
   }
-  /**
-   * {@inheritDoc}
-   *
-   * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-   * ctx}.
-   */
-  @Override
-  public ASTNode visitDiceSides(MTScript2Parser.DiceSidesContext ctx) {
-    return visitChildren(ctx);
-  }
+
   /**
    * {@inheritDoc}
    *
@@ -394,16 +382,6 @@ public class BuildASTVisitor extends MTScript2ParserBaseVisitor<ASTNode>
     return new LiteralNode.NullLiteralNode();
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-   * ctx}.
-   */
-  @Override
-  public ASTNode visitIntegerLiteral(MTScript2Parser.IntegerLiteralContext ctx) {
-    return visitChildren(ctx);
-  }
   /**
    * {@inheritDoc}
    *
