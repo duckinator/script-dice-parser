@@ -14,6 +14,7 @@
  */
 package net.rptools.mtscript.parser.visitor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,9 @@ import net.rptools.mtscript.ast.LiteralNode;
 import net.rptools.mtscript.ast.ScriptModuleNode;
 import net.rptools.mtscript.ast.ScriptNode;
 import net.rptools.mtscript.ast.TextNode;
+import net.rptools.mtscript.ast.VariableNode;
+import net.rptools.mtscript.ast.VariableNode.Scope;
+import net.rptools.mtscript.parser.MTScript2Lexer;
 import net.rptools.mtscript.parser.MTScript2Parser;
 import net.rptools.mtscript.parser.MTScript2ParserBaseVisitor;
 import net.rptools.mtscript.parser.MTScript2ParserVisitor;
@@ -52,6 +56,9 @@ implements MTScript2ParserVisitor<ASTNode> {
     /** Entry point for macros. */
     @Override
     public ASTNode visitScript(MTScript2Parser.ScriptContext ctx) {
+        if (ctx.scriptBody().getChildCount() == 0) {
+            return new ScriptNode(Collections.emptyList());
+        }
         List<ASTNode> children =
                 ctx.scriptBody().children.stream().map(c -> c.accept(this)).collect(Collectors.toList());
         return new ScriptNode(children);
@@ -105,15 +112,22 @@ implements MTScript2ParserVisitor<ASTNode> {
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-     * ctx}.
+     * Node to hold a variable when it is being **called or used.**
      */
     @Override
     public ASTNode visitVariable(MTScript2Parser.VariableContext ctx) {
-        return visitChildren(ctx);
+        switch(ctx.scope.getTokenIndex()) {
+        case MTScript2Lexer.LOCAL_VAR_LEADER:
+            return new VariableNode(Scope.LOCAL, ctx.IDENTIFIER().getText());
+        case MTScript2Lexer.GLOBAL_VAR_LEADER:
+            return new VariableNode(Scope.GLOBAL, ctx.IDENTIFIER().getText());
+        case MTScript2Lexer.PROPERTY_VAR_LEADER:
+            return new VariableNode(Scope.PROPERTY, ctx.IDENTIFIER().getText());
+        default:
+            throw new IllegalStateException("Unknown variable scope encountered!");
+        }
     }
+
     /**
      * {@inheritDoc}
      *
@@ -131,27 +145,7 @@ implements MTScript2ParserVisitor<ASTNode> {
      * ctx}.
      */
     @Override
-    public ASTNode visitParenGroup(MTScript2Parser.ParenGroupContext ctx) {
-        return visitChildren(ctx);
-    }
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-     * ctx}.
-     */
-    @Override
     public ASTNode visitBraceGroup(MTScript2Parser.BraceGroupContext ctx) {
-        return visitChildren(ctx);
-    }
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-     * ctx}.
-     */
-    @Override
-    public ASTNode visitDice(MTScript2Parser.DiceContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -162,16 +156,6 @@ implements MTScript2ParserVisitor<ASTNode> {
         return new LiteralNode.IntegerLiteralNode(x);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-     * ctx}.
-     */
-    @Override
-    public ASTNode visitDoubleValue(MTScript2Parser.DoubleValueContext ctx) {
-        return visitChildren(ctx);
-    }
     /**
      * {@inheritDoc}
      *
@@ -252,47 +236,23 @@ implements MTScript2ParserVisitor<ASTNode> {
     public ASTNode visitDargDouble(MTScript2Parser.DargDoubleContext ctx) {
         return visitChildren(ctx);
     }
+
     /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-     * ctx}.
+     * DO NOT USE.
      */
     @Override
     public ASTNode visitScriptModuleDefinition(MTScript2Parser.ScriptModuleDefinitionContext ctx) {
-        return visitChildren(ctx);
+        throw new IllegalStateException("This should not be hit directly.");
     }
+
     /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-     * ctx}.
+     * DO NOT USE.
      */
     @Override
     public ASTNode visitScriptImports(MTScript2Parser.ScriptImportsContext ctx) {
-        return visitChildren(ctx);
+        throw new IllegalStateException("This should not be hit directly.");
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
-     * ctx}.
-     */
-    @Override
-    public ASTNode visitModuleBodyConstant(MTScript2Parser.ModuleBodyConstantContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    @Override
-    public ASTNode visitModuleBodyField(MTScript2Parser.ModuleBodyFieldContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    @Override
-    public ASTNode visitModuleBodyMethod(MTScript2Parser.ModuleBodyMethodContext ctx) {
-        return visitChildren(ctx);
-    }
     /**
      * {@inheritDoc}
      *
@@ -301,7 +261,7 @@ implements MTScript2ParserVisitor<ASTNode> {
      */
     @Override
     public ASTNode visitScriptVersion(MTScript2Parser.ScriptVersionContext ctx) {
-        return visitChildren(ctx);
+        throw new IllegalStateException("This should not be hit directly.");
     }
 
     /** Do not use. */

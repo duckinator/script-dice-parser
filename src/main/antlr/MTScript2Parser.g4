@@ -30,11 +30,6 @@ numDice                     : val=DECIMAL_LITERAL           # numDiceLiteral
                             | LBRACE val=expression RBRACE  # braceGroup
                             ;
 
-doubleValue                 : NUMBER_LITERAL
-                            ;
-
-
-
 diceArguments               : diceArgumentList
                             ;
 
@@ -51,7 +46,7 @@ diceArgumentVal             : IDENTIFIER                                        
                             | variable                                          # dargVariable
                             | STRING_LITERAL                                    # dargString
                             | integerLiteral                                    # dargInteger
-                            | doubleValue                                       # dargDouble
+                            | NUMBER_LITERAL                                    # dargDouble
                             ;
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -61,9 +56,9 @@ scriptModuleDefinition      : name=IDENTIFIER version=NUMBER_LITERAL desc=STRING
 
 scriptImports               :  KEYWORD_USE name=IDENTIFIER scriptVersion (KEYWORD_AS as=IDENTIFIER)? SEMI;
 
-scriptModuleBody            : constantDeclaration   # moduleBodyConstant
-                            | fieldDeclaration      # moduleBodyField
-                            | methodDeclaration     # moduleBodyMethod
+scriptModuleBody            : constantDeclaration
+                            | fieldDeclaration
+                            | methodDeclaration
                             ;
 
 
